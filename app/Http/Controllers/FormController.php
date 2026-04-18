@@ -12,6 +12,7 @@ use App\Services\QRCodeService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
+use Cloudinary\Cloudinary;
 
 class FormController extends Controller
 {
@@ -45,7 +46,12 @@ class FormController extends Controller
         ]);
 
         // Store payment proof
-        $proofPath = $request->file('payment_proof')->store('payment_proofs', 'public');
+        $cloudinary = new Cloudinary();
+        $uploaded = $cloudinary->uploadApi()->upload(
+            $request->file('payment_proof')->getRealPath()
+        );
+
+        $proofPath = $uploaded['secure_url'];
 
         // Create participant
         $participant = Participant::create([

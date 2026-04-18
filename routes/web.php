@@ -5,11 +5,12 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\AttendanceController;
 use App\Http\Controllers\FormController;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UploadController;
 
 // ─── PUBLIC FORM ──────────────────────────────────────────────────────────────
 Route::get('/', [FormController::class, 'index'])->name('form.index');
 Route::post('/register', [FormController::class, 'store'])->name('form.store');
-
+Route::post('/upload', [UploadController::class, 'upload']);
 // ─── ADMIN AUTH ───────────────────────────────────────────────────────────────
 Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('/login', [AdminController::class, 'loginForm'])->name('login');
