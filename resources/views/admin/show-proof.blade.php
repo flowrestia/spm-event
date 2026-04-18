@@ -233,7 +233,7 @@
         <div class="proof-section">
             <div class="proof-title">📷 File Bukti Pembayaran</div>
             <div class="proof-container">
-                @if(str_ends_with($proofUrl, '.pdf') || strtolower(match_mime($proofUrl)) == 'application/pdf')
+                @if(str_ends_with(strtolower($proofUrl), '.pdf'))
                     <div class="proof-pdf">
                         <div class="pdf-icon">📄</div>
                         <div class="pdf-text">Bukti pembayaran dalam format PDF</div>
@@ -242,7 +242,7 @@
                         </a>
                     </div>
                 @else
-                    <img src="{{ $proofUrl }}" alt="Bukti Pembayaran" class="proof-image" onerror="this.parentElement.innerHTML='<div class=proof-pdf><div class=pdf-icon>❌</div><div class=pdf-text>Gagal memuat gambar</div></div>'">
+                    <img src="{{ $proofUrl }}" alt="Bukti Pembayaran" class="proof-image" onerror="this.parentElement.innerHTML='<div class=&quot;proof-pdf&quot;><div class=&quot;pdf-icon&quot;>❌</div><div class=&quot;pdf-text&quot;>Gagal memuat gambar</div></div>'">
                 @endif
             </div>
         </div>
