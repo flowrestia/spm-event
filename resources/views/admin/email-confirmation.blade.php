@@ -350,14 +350,16 @@ Sekolah Pasar Modal – Financial Glow Up 2026
         <div class="action-section">
             <div>
                 <button type="button" 
-                        onclick="copyToClipboard('Klik tombol Copy Subject dulu!'); alert('Subject: 🎟️ Tiket Anda - Sekolah Pasar Modal Financial Glow Up 2026'); copyToClipboard('🎟️ Tiket Anda - Sekolah Pasar Modal Financial Glow Up 2026');"
+                        onclick="copySubject()"
                         class="button button-secondary"
+                        id="copySubjectBtn"
                         style="width: 100%; margin-bottom: 0.5rem;">
                     📋 Copy Subject
                 </button>
                 <button type="button" 
-                        onclick="copyToClipboard(document.querySelector('.email-preview').innerText);"
+                        onclick="copyBody()"
                         class="button button-secondary"
+                        id="copyBodyBtn"
                         style="width: 100%;">
                     📋 Copy Body
                 </button>
@@ -392,6 +394,53 @@ Sekolah Pasar Modal – Financial Glow Up 2026
 </div>
 
 <script>
+const SUBJECT = '🎟️ Tiket Anda - Sekolah Pasar Modal Financial Glow Up 2026';
+
+function copySubject() {
+    const btn = document.getElementById('copySubjectBtn');
+    const originalText = btn.textContent;
+    
+    navigator.clipboard.writeText(SUBJECT).then(() => {
+        btn.textContent = '✅ Subject di-copy!';
+        setTimeout(() => {
+            btn.textContent = originalText;
+        }, 2000);
+    }).catch(() => {
+        alert('Gagal copy subject. Silakan copy manual:\n\n' + SUBJECT);
+    });
+}
+
+function copyBody() {
+    const btn = document.getElementById('copyBodyBtn');
+    const originalText = btn.textContent;
+    const previewEl = document.querySelector('.email-preview');
+    
+    if (!previewEl) {
+        alert('Email preview tidak ditemukan');
+        return;
+    }
+    
+    // Get semua text dari email preview
+    let bodyText = previewEl.innerText;
+    
+    // Hapus email header (From, To, Subject)
+    const headerMatch = bodyText.match(/From:[\s\S]*?Subject:[^\n]*\n/);
+    if (headerMatch) {
+        bodyText = bodyText.slice(headerMatch[0].length);
+    }
+    
+    bodyText = bodyText.trim();
+    
+    navigator.clipboard.writeText(bodyText).then(() => {
+        btn.textContent = '✅ Body di-copy!';
+        setTimeout(() => {
+            btn.textContent = originalText;
+        }, 2000);
+    }).catch(() => {
+        alert('Gagal copy body. Silakan copy manual dari preview di atas.');
+    });
+}
+
 function copyToClipboard(text) {
     navigator.clipboard.writeText(text).then(() => {
         // Feedback

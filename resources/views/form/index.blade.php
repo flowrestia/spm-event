@@ -539,6 +539,23 @@
     </div>
 </div>
 
+<!-- Error Modal - Contact Admin -->
+<div class="modal-overlay" id="errorModal">
+    <div class="modal-box">
+        <div class="modal-icon">⚠️</div>
+        <h3 class="modal-title">Terjadi Kendala</h3>
+        <p class="modal-text" id="errorMessage">
+            Gagal mengirimkan formulir. Silakan coba lagi atau hubungi admin melalui WhatsApp.
+        </p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.5rem;">
+            <button class="btn-modal" style="background:rgba(255,255,255,.1);color:white; width: 100%; padding: 0.75rem 1rem;" onclick="closeErrorModal()">Coba Lagi</button>
+            <a id="whatsappLink" href="#" target="_blank" class="btn-modal" style="width: 100%; padding: 0.75rem 1rem; background: linear-gradient(135deg, #25d366, #20ba5c); text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                💬 Chat Admin
+            </a>
+        </div>
+    </div>
+</div>
+
 <script>
 // Radio group highlight
 document.querySelectorAll('.radio-option input[type="radio"]').forEach(radio => {
@@ -593,8 +610,17 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
             method: 'POST',
             headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
             body: formData,
+            timeout: 30000,
         });
-        const data = await res.json();
+
+        let data;
+        try {
+            data = await res.json();
+        } catch (e) {
+            console.error('Invalid JSON response:', res);
+            showErrorModal('Server bermasalah. Silakan coba lagi atau hubungi admin.');
+            throw e;
+        }
 
         if (res.ok && data.success) {
             document.getElementById('modalName').textContent  = data.name;
@@ -611,17 +637,41 @@ document.getElementById('registrationForm').addEventListener('submit', async fun
                 if (el) el.textContent = msgs[0];
                 if (ctrl) ctrl.classList.add('is-invalid');
             });
+        } else if (res.status >= 500) {
+            showErrorModal(data.message || 'Server error. Coba lagi nanti.');
         } else {
-            alert(data.message || 'Terjadi kesalahan. Coba lagi.');
+            showErrorModal(data.message || 'Gagal mengirim formulir. Coba lagi.');
         }
-    } catch {
-        alert('Koneksi gagal. Periksa jaringan Anda.');
+    } catch (error) {
+        console.error('Form submission error:', error);
+        showErrorModal('Koneksi gagal. Periksa koneksi internet Anda. Ukuran file harus maksimal 5MB.');
     } finally {
         btn.disabled = false;
         btnText.textContent = 'Daftar Sekarang';
         btnIcon.textContent = '✦';
     }
 });
+
+function showErrorModal(message) {
+    document.getElementById('errorMessage').textContent = message;
+    
+    // Generate WhatsApp link with pre-filled message
+    const adminPhone = '6285731932717'; // Format: 62857... (no + or 0)
+    const whatsappMessage = encodeURIComponent(
+        `Halo Admin,\n\n` +
+        `Saya ingin melaporkan kendala saat register ke formulir Sekolah Pasar Modal Financial Glow Up 2026.\n\n` +
+        `Kendala: ${message}\n\n` +
+        `Mohon bantuan. Terima kasih.`
+    );
+    
+    const whatsappLink = `https://wa.me/${adminPhone}?text=${whatsappMessage}`;
+    document.getElementById('whatsappLink').href = whatsappLink;
+    document.getElementById('errorModal').classList.add('active');
+}
+
+function closeErrorModal() {
+    document.getElementById('errorModal').classList.remove('active');
+}
 
 function clearErrors() {
     document.querySelectorAll('.form-error').forEach(e => e.textContent = '');
@@ -631,8 +681,14 @@ function clearErrors() {
 function closeModal() {
     document.getElementById('successModal').classList.remove('active');
 }
+
+// Close modals on outside click
 document.getElementById('successModal').addEventListener('click', function(e) {
     if (e.target === this) closeModal();
+});
+
+document.getElementById('errorModal').addEventListener('click', function(e) {
+    if (e.target === this) closeErrorModal();
 });
 </script>
 </body>

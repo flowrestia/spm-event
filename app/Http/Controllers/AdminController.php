@@ -150,9 +150,15 @@ class AdminController extends Controller
 
     public function showProof(Participant $participant)
     {
-        $path = Storage::disk('public')->path($participant->payment_proof);
-        $mime = mime_content_type($path);
-        return response()->file($path, ['Content-Type' => $mime]);
+        // payment_proof adalah URL dari Cloudinary
+        if (!$participant->payment_proof) {
+            return redirect()->back()->with('error', 'Bukti pembayaran tidak ditemukan.');
+        }
+
+        return view('admin.show-proof', [
+            'participant' => $participant,
+            'proofUrl' => $participant->payment_proof,
+        ]);
     }
 
     public function emailConfirmation(Participant $participant)
